@@ -29,6 +29,7 @@ const products: Product[] = [
 const Index = () => {
   const [activeSection, setActiveSection] = useState('home');
   const [cart, setCart] = useState<CartItem[]>([]);
+  const [priceFilter, setPriceFilter] = useState<'all' | 'under3000' | '3000to5000' | 'over5000'>('all');
 
   const addToCart = (product: Product) => {
     setCart(prev => {
@@ -57,6 +58,14 @@ const Index = () => {
   };
 
   const totalPrice = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+
+  const filteredProducts = products.filter(product => {
+    if (priceFilter === 'all') return true;
+    if (priceFilter === 'under3000') return product.price < 3000;
+    if (priceFilter === '3000to5000') return product.price >= 3000 && product.price < 5000;
+    if (priceFilter === 'over5000') return product.price >= 5000;
+    return true;
+  });
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-secondary/20">
@@ -194,8 +203,36 @@ const Index = () => {
       {activeSection === 'catalog' && (
         <section className="container mx-auto px-4 py-12 animate-fade-in">
           <h2 className="text-4xl font-bold mb-8">Каталог букетов</h2>
+          
+          <div className="flex flex-wrap gap-3 mb-8">
+            <Button
+              variant={priceFilter === 'all' ? 'default' : 'outline'}
+              onClick={() => setPriceFilter('all')}
+            >
+              Все букеты
+            </Button>
+            <Button
+              variant={priceFilter === 'under3000' ? 'default' : 'outline'}
+              onClick={() => setPriceFilter('under3000')}
+            >
+              До 3000 ₽
+            </Button>
+            <Button
+              variant={priceFilter === '3000to5000' ? 'default' : 'outline'}
+              onClick={() => setPriceFilter('3000to5000')}
+            >
+              От 3000 ₽
+            </Button>
+            <Button
+              variant={priceFilter === 'over5000' ? 'default' : 'outline'}
+              onClick={() => setPriceFilter('over5000')}
+            >
+              От 5000 ₽
+            </Button>
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {products.map((product) => (
+            {filteredProducts.map((product) => (
               <Card key={product.id} className="overflow-hidden hover:shadow-lg transition-all">
                 <img src={product.image} alt={product.name} className="w-full h-64 object-cover" />
                 <CardContent className="p-6">
